@@ -22,6 +22,9 @@ class Worker(ABC):
     def get_lunch_break(self):
         yield self.env.timeout(self.lunch_break)
 
+    def travel_to(self, location):
+        pass
+
 
 class Picker(Worker):
 
@@ -40,9 +43,9 @@ class Picker(Worker):
     def pick_item(self):
         pass
 
-    def travel_to(self, location):
+    def get_product(self):
         pass
 
-    def add_empty_container(self):
-        pass    
+    def add_empty_container(self, location):
+        pass
 
