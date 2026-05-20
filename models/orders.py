@@ -11,3 +11,11 @@ class BaseOrder(ABC):
     status: str
     estimated_compleation_time: float
 
+
+@dataclass(order=True)
+class DistributeProductByCustomer(BaseOrder):
+    priority: int
+    product: str
+    initial_product_location: str
+    total_qty: int
+
