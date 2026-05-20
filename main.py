@@ -1,5 +1,5 @@
 import simpy
-from models.workers import Picker
+from core.workers import Picker
 
 
 env = simpy.Environment()
