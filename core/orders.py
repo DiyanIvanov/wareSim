@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 
 
 @dataclass
@@ -19,3 +19,12 @@ class DistributeProductByCustomer(BaseOrder):
     initial_product_location: str
     total_qty: int
 
+
+@dataclass(order=True)
+class IntakeOrder(BaseOrder):
+    due_time: float
+    products: Dict[str: int]
+
+
+    def __lt__(self, other):
+        return self.due_time < other.due_time
