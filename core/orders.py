@@ -26,5 +26,9 @@ class IntakeOrder(BaseOrder):
     products: Dict[str: int]
 
 
-    def __lt__(self, other):
-        return self.due_time < other.due_time
+@dataclass(order=True)
+class PaletToLocation(BaseOrder):
+    priority: int
+    product: str
+    initial_location: str
+    destination_location: str
