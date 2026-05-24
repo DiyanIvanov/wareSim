@@ -35,9 +35,9 @@ class DistributeProductByCustomer(BaseOrder):
             raise ValueError("total_qty must be positive")
         if self.priority <= 0:
             raise ValueError("priority must be positive")
-        if self.product is None:
+        if not self.product:
             raise ValueError("product must be provided")
-        if self.initial_product_location is None:
+        if not self.initial_product_location:
             raise ValueError("Initial location must be provided")
 
 
@@ -50,12 +50,12 @@ class IntakeOrder(BaseOrder):
         super().__post_init__()
         if self.due_time <= 0:
             raise ValueError("due time must be positive")
-        if self.products is None:
+        if not self.products:
             raise ValueError("products must not be empty")
 
 
 @dataclass(order=True)
-class PalLetToLocation(BaseOrder):
+class PalletToLocation(BaseOrder):
     priority: int
     product: str
     initial_location: str
@@ -65,9 +65,9 @@ class PalLetToLocation(BaseOrder):
         super().__post_init__()
         if self.priority <= 0:
             raise ValueError("priority must be positive")
-        if self.product is None:
+        if not self.product:
             raise ValueError("product must be provided")
-        if self.initial_location is None:
+        if not self.initial_location:
             raise ValueError("initial location must be provided")
-        if self.destination_location is None:
+        if not self.destination_location:
             raise ValueError("destination location must be provided")
