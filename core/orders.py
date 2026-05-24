@@ -9,7 +9,7 @@ class BaseOrder(ABC):
     locations: List[str]
     created_at: float
     status: str
-    estimated_compleation_time: float
+    estimated_completion_time: float
 
 
 @dataclass(order=True)
