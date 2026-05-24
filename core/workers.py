@@ -4,12 +4,12 @@ import simpy
 
 class Worker(ABC):
 
-    def __init__(self, env, warehouse_lauout, short_brake = 15, lunch_break = 30):
+    def __init__(self, env, warehouse_layout, short_brake = 15, lunch_break = 30):
         self.env = env
         self.action = env.process(self.run())
         self.short_break = short_brake
         self.lunch_break = lunch_break
-        self.warehouse_lauout = warehouse_lauout
+        self.warehouse_layout = warehouse_layout
 
     @abstractmethod
     def run(self):
@@ -28,11 +28,11 @@ class Worker(ABC):
 
 class Picker(Worker):
 
-    TAKE_EQUPMENT_RATE = 5
+    TAKE_EQUIPMENT_RATE = 5
     PICK_RATE = 1   
 
-    def __init__(self, env, warehouse_lauout, short_brake = 15, lunch_break = 30):
-        super().__init__(env, warehouse_lauout, short_brake, lunch_break)
+    def __init__(self, env, warehouse_layout, short_brake = 15, lunch_break = 30):
+        super().__init__(env, warehouse_layout, short_brake, lunch_break)
         self.order = None
 
     def run(self):
