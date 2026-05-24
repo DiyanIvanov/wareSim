@@ -23,11 +23,11 @@ class DistributeProductByCustomer(BaseOrder):
 @dataclass(order=True)
 class IntakeOrder(BaseOrder):
     due_time: float
-    products: Dict[str: int]
+    products: Dict[str, int]
 
 
 @dataclass(order=True)
-class PaletToLocation(BaseOrder):
+class PalLetToLocation(BaseOrder):
     priority: int
     product: str
     initial_location: str
