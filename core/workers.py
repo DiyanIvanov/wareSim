@@ -5,26 +5,47 @@ from core.orders import DistributeProductByCustomer
 
 class Worker(sim.Component, ABC):
 
+    BREAK_WINDOWS = [[7200, 7650], [21600,22500]]
+    LUNCH_WINDOW = [14400,15300]
+    MAX_ALLOWED_SHORT_BREAKS = 2
+
     def __init__(self, warehouse_layout, short_break=15, lunch_break=30, **kwargs):
         super().__init__(**kwargs)
         self.short_break = short_break
         self.lunch_break = lunch_break
         self.warehouse_layout = warehouse_layout
+        self.breaks_taken = set()
+        self.lunch_breaks = 0
 
     @abstractmethod
     def process(self):
-        """Must be implemented as a generator that yields SimPy events."""
+        """Must be implemented"""
         raise NotImplementedError
 
     def get_short_break(self):
-        self.hold(self.short_break)
+        if self._break_allowed():
+            current_breaks = max(self.breaks_taken)
+            self.breaks_taken.add(current_breaks + 1)
+            self.hold(self.short_break)
 
     def get_lunch_break(self):
-        self.hold(self.lunch_break)
+        if self.lunch_breaks < 1 and self.LUNCH_WINDOW[1] >= self.env.now() <= self.LUNCH_WINDOW[1]:
+            self.lunch_breaks += 1
+            self.hold(self.lunch_break)
 
     def travel_to(self, location):
+        # ToDo after location class is implemented
         pass
 
+    def _break_allowed(self):
+        if max(self.breaks_taken) >= self.MAX_ALLOWED_SHORT_BREAKS:
+            return False
+
+        for i, window in enumerate(self.BREAK_WINDOWS):
+            if window[1] <= self.env.now() <= window[2] and i not in self.breaks_taken:
+                return True
+
+        return False
 
 class Picker(Worker):
 
