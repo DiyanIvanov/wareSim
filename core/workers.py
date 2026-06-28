@@ -9,11 +9,11 @@ class Worker(sim.Component, ABC):
     LUNCH_WINDOW = [14400,15300]
     MAX_ALLOWED_SHORT_BREAKS = 2
 
-    def __init__(self, warehouse_layout, short_break=15, lunch_break=30, **kwargs):
+    def __init__(self, warehouse, short_break=15, lunch_break=30, **kwargs):
         super().__init__(**kwargs)
         self.short_break = short_break
         self.lunch_break = lunch_break
-        self.warehouse_layout = warehouse_layout
+        self.warehouse_layout = warehouse
         self.breaks_taken = set()
         self.lunch_breaks = 0
 
@@ -52,8 +52,8 @@ class Picker(Worker):
     TAKE_EQUIPMENT_RATE = 5
     PICK_RATE = 1
 
-    def __init__(self, warehouse_layout, short_break=15, lunch_break=30,order = None,  **kwargs):
-        super().__init__(warehouse_layout, short_break, lunch_break, **kwargs)
+    def __init__(self, warehouse, short_break=15, lunch_break=30,order = None,  **kwargs):
+        super().__init__(warehouse, short_break, lunch_break, **kwargs)
         self.order = order
         self.current_location = None
 
@@ -70,3 +70,16 @@ class Picker(Worker):
 
     def add_empty_container(self):
         pass
+
+
+class IntakeWorker(Worker):
+
+    INTAKE_RATE_PER_PALLET = 180 # measured in seconds
+
+    def __init__(self, warehouse, short_break=15, lunch_break=30,**kwargs):
+        super().__init__(warehouse, short_break=15, lunch_break=30,**kwargs)
+        self.order = None
+
+    def process(self):
+        while True:
+            self.hold(self.INTAKE_RATE_PER_PALLET)
