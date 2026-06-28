@@ -12,6 +12,7 @@ class Warehouse:
 
         # Intake Resources
         self.intake_queue = sim.Queue(name="intake_queue")
+        self.pick_by_customer_staging_area = sim.Queue(name="pick_by_customer_staging_area")
         self.intake_workers: List[IntakeWorker] = []
         self.pickers: List[Picker] = []
 
