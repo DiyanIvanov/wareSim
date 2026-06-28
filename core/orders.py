@@ -1,7 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List, Dict
-from datetime import datetime
 import pandas as pd
 import salabim as sim
 
@@ -99,7 +98,7 @@ class IntakeOrderGenerator(sim.Component):
                 locations=['Salabim'],
                 created_at=1,
                 status="Pending",
-                arrival_time=data[data['order_id'] == order]['due_time'].values[0],
+                arrival_time=data[data['order_id'] == order]['arrival_time'].values[0],
                 pallets=self._load_pallets(data, order),
                 estimated_completion_time=0.1
             ))
