@@ -1,84 +1,65 @@
 from abc import ABC
-from dataclasses import dataclass
-from typing import List, Dict
 import pandas as pd
 import salabim as sim
 
 
-@dataclass
-class BaseOrder(ABC):
-    id: int
-    locations: List[str]
-    created_at: float
-    status: str
-    estimated_completion_time: float
 
-    def __post_init__(self):
-        if len(self.locations) <= 0:
+class BaseOrder(sim.Component, ABC):
+    VALID_STATUSES = {"Pending", "Completed", "Assigned", "In Progress"}
+
+    def __init__(self, id, locations, created_at, status, estimated_completion_time, **kwargs):
+        super().__init__(**kwargs)
+
+        self._validate(locations, status, estimated_completion_time, created_at)
+
+        self.id = id
+        self.locations = locations
+        self.created_at = created_at
+        self.status = status
+        self.estimated_completion_time = estimated_completion_time
+
+    def _validate(self, locations, status, estimated_completion_time, created_at):
+        if not locations:
             raise ValueError("locations must not be empty")
-        if self.status not in ["Pending", "Completed", "Assigned", "In Progress"]:
-            raise ValueError("status must be Pending or Completed")
-        if self.estimated_completion_time <= 0:
+        if status not in self.VALID_STATUSES:
+            raise ValueError(f"status must be one of {self.VALID_STATUSES}")
+        if estimated_completion_time <= 0:
             raise ValueError("estimated completion time must be positive")
-        if self.created_at <= 0:
-            raise ValueError("created_at must be positive")
+        if created_at < 0:
+            raise ValueError("created_at must not be negative")
 
 
-@dataclass(order=True)
-class DistributeProductByCustomer(BaseOrder):
-    priority: int
-    product: str
-    initial_product_location: str
-    total_qty: int
-
-    def __post_init__(self):
-        super().__post_init__()
-        if self.total_qty <= 0:
-            raise ValueError("total_qty must be positive")
-        if self.priority <= 0:
-            raise ValueError("priority must be positive")
-        if not self.product:
-            raise ValueError("product must be provided")
-        if not self.initial_product_location:
-            raise ValueError("Initial location must be provided")
-
-
-@dataclass(order=True)
 class IntakeOrder(BaseOrder):
-    arrival_time: float
-    pallets: Dict[str, int]
 
-    def __post_init__(self):
-        super().__post_init__()
-        if self.arrival_time <= 0:
-            raise ValueError("arrival time must be positive")
-        if not self.pallets:
-            raise ValueError("Pallets must not be empty")
+    def __init__(self,
+                      id,
+                      locations,
+                      created_at,
+                      status,
+                      estimated_completion_time,
+                      arrival_time,
+                      pallets,
+                      **kwargs
+                      ):
+        super().__init__(id, locations, created_at, status, estimated_completion_time, **kwargs)
 
+        self._validate_intake(arrival_time, pallets)
+        self.arrival_time = arrival_time
+        self.pallets = pallets
 
-@dataclass(order=True)
-class PalletToLocation(BaseOrder):
-    priority: int
-    product: str
-    initial_location: str
-    destination_location: str
+    def _validate_intake(self, arrival_time, pallets):
+        if arrival_time < 0:
+            raise ValueError("arrival time must not be negative")
+        if not pallets:
+            raise ValueError("pallets must not be empty")
 
-    def __post_init__(self):
-        super().__post_init__()
-        if self.priority <= 0:
-            raise ValueError("priority must be positive")
-        if not self.product:
-            raise ValueError("product must be provided")
-        if not self.initial_location:
-            raise ValueError("initial location must be provided")
-        if not self.destination_location:
-            raise ValueError("destination location must be provided")
+class Pallet(sim.Component):
 
-@dataclass
-class Pallet:
-    product: str
-    qty: int
-    order_id: str
+    def __init__(self, product, qty, order_id, **kwargs):
+        super().__init__(**kwargs)
+        self.product = product
+        self.qty = qty
+        self.order_id = order_id
 
 
 class IntakeOrderGenerator(sim.Component):
@@ -120,3 +101,9 @@ class IntakeOrderGenerator(sim.Component):
         for order in self.orders:
             self.hold(order.arrival_time - self.env.now())
             order.enter(self.warehouse.intake_queue)
+
+            # wake a passive worker
+            for worker in self.warehouse.intake_workers:
+                if worker.ispassive():
+                    worker.activate()
+                    break

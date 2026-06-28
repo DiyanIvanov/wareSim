@@ -1,6 +1,4 @@
 import salabim as sim
-from core.workers import Picker
-from core.orders import DistributeProductByCustomer
 from warehouse import Warehouse
 
 

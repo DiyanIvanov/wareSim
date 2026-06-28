@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import salabim as sim
-from core.orders import DistributeProductByCustomer
+# from core.orders import DistributeProductByCustomer
 
 
 class Worker(sim.Component, ABC):
