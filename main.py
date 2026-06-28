@@ -9,5 +9,5 @@ env = sim.Environment(trace=True)
 #
 # env.run(till=10)
 
-warehouse = Warehouse(env)
+warehouse = Warehouse(env, './data/demo_data.csv')
 warehouse.run()
