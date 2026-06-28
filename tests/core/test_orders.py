@@ -32,8 +32,8 @@ def distribute_product_by_customer(base_fields):
 def intake_order(base_fields):
     return {
         **base_fields,
-        "due_time": 1.0,
-        "products": {"test_product": 1}
+        "arrival_time": 1.0,
+        "pallets": {"test_product": 1}
     }
 
 
@@ -145,16 +145,16 @@ class TestDistributeProductByCustomer:
 class TestIntakeOrder:
 
     def test_valid_order_creates(self, intake_order):
-        assert intake_order["due_time"] == 1.0
-        assert intake_order["products"] == {"test_product": 1}
+        assert intake_order["arrival_time"] == 1.0
+        assert intake_order["pallets"] == {"test_product": 1}
 
     def test_zero_due_time_raises(self, base_fields):
-        with pytest.raises(ValueError, match="due time must be positive"):
-            IntakeOrder(**base_fields, due_time=0, products={"test_product": 10})
+        with pytest.raises(ValueError, match="arrival time must be positive"):
+            IntakeOrder(**base_fields, arrival_time=0, pallets={"test_product": 10})
 
     def test_empty_products_raises(self, base_fields):
-        with pytest.raises(ValueError, match="products must not be empty"):
-            IntakeOrder(**base_fields, due_time=5.0, products={})
+        with pytest.raises(ValueError, match="Pallets must not be empty"):
+            IntakeOrder(**base_fields, arrival_time=5.0, pallets={})
 
 
 class TestPalletToLocation:

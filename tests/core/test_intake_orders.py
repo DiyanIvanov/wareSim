@@ -33,7 +33,7 @@ class TestIntakeOrderGenerator:
         generator.orders = generator._load_orders_from_csv(str(csv_file))
 
         for order in generator.orders:
-            assert len(order.products) == df[df['order_id'] == order.id]['product'].count()
+            assert len(order.pallets) == df[df['order_id'] == order.id]['product'].count()
 
 
     def test_orders_are_sorted_by_arrival_time(self, sample_df, tmp_path):
@@ -55,7 +55,7 @@ class TestIntakeOrderGenerator:
 
         order = generator.orders[0]
         print(order)
-        pallet = order.products[0]
+        pallet = order.pallets[0]
         assert pallet.order_id == order.id
         assert isinstance(pallet.qty, int)
         assert isinstance(pallet.product, str)
