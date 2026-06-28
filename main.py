@@ -1,7 +1,9 @@
-import simpy
+import salabim as sim
 from core.workers import Picker
+from core.orders import DistributeProductByCustomer
 
 
-env = simpy.Environment()
-picker = Picker(env)
-env.run(until=10)
+env = sim.Environment(trace=True)
+picker = Picker(warehouse_layout=None)
+
+env.run(till=10)
