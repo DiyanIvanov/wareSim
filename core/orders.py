@@ -1,7 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List, Dict
-from datetime import datetime
 import pandas as pd
 import salabim as sim
 
@@ -47,14 +46,14 @@ class DistributeProductByCustomer(BaseOrder):
 @dataclass(order=True)
 class IntakeOrder(BaseOrder):
     arrival_time: float
-    products: Dict[str, int]
+    pallets: Dict[str, int]
 
     def __post_init__(self):
         super().__post_init__()
         if self.arrival_time <= 0:
-            raise ValueError("due time must be positive")
-        if not self.products:
-            raise ValueError("products must not be empty")
+            raise ValueError("arrival time must be positive")
+        if not self.pallets:
+            raise ValueError("Pallets must not be empty")
 
 
 @dataclass(order=True)
@@ -99,8 +98,8 @@ class IntakeOrderGenerator(sim.Component):
                 locations=['Salabim'],
                 created_at=1,
                 status="Pending",
-                arrival_time=data[data['order_id'] == order]['due_time'].values[0],
-                products=self._load_pallets(data, order),
+                arrival_time=data[data['order_id'] == order]['arrival_time'].values[0],
+                pallets=self._load_pallets(data, order),
                 estimated_completion_time=0.1
             ))
 
