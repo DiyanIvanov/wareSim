@@ -1,10 +1,11 @@
 import salabim as sim
 from typing import List
 from core.workers import IntakeWorker, Picker
-from pandas import DataFrame
+from core.orders import IntakeOrderGenerator
+
 
 class Warehouse:
-    def __init__(self, env, orders: DataFrame, simulation_duration=28800):
+    def __init__(self, env, orders: str, simulation_duration=28800):
         self.env = env
         self.orders = orders
         self.simulation_duration = simulation_duration
@@ -16,6 +17,9 @@ class Warehouse:
 
 
     def setup(self):
+        intake_orders = IntakeOrderGenerator(self, self.orders)
+        self.intake_workers.append(intake_orders.orders)
+
         for i in range(2):
             w = IntakeWorker(warehouse=self, name=f"intake_{i}")
             self.intake_workers.append(w)
