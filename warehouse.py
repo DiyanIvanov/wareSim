@@ -19,10 +19,10 @@ class Warehouse:
 
     def setup(self):
         intake_orders = IntakeOrderGenerator(self, self.orders)
-        self.intake_workers.append(intake_orders.orders)
+        # self.intake_queue.append(intake_orders.orders)
 
         for i in range(2):
-            w = IntakeWorker(warehouse=self, name=f"intake_{i}")
+            w = IntakeWorker(warehouse=self, name=f"intake_worker_{i}")
             self.intake_workers.append(w)
 
     def run(self):
