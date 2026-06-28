@@ -79,7 +79,16 @@ class IntakeWorker(Worker):
     def __init__(self, warehouse, short_break=15, lunch_break=30,**kwargs):
         super().__init__(warehouse, short_break=short_break, lunch_break=lunch_break,**kwargs)
         self.order = None
+        self.warehouse = warehouse
 
     def process(self):
         while True:
-            self.hold(self.INTAKE_RATE_PER_PALLET)
+            if len(self.warehouse.intake_queue) == 0:
+                self.passivate()
+
+            self.order = self.warehouse.intake_queue.pop()
+
+            for pallet in self.order.pallets:
+                self.hold(self.INTAKE_RATE_PER_PALLET)
+                
+
