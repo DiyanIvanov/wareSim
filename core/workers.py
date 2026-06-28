@@ -77,7 +77,7 @@ class IntakeWorker(Worker):
     INTAKE_RATE_PER_PALLET = 180 # measured in seconds
 
     def __init__(self, warehouse, short_break=15, lunch_break=30,**kwargs):
-        super().__init__(warehouse, short_break=15, lunch_break=30,**kwargs)
+        super().__init__(warehouse, short_break=short_break, lunch_break=lunch_break,**kwargs)
         self.order = None
 
     def process(self):
