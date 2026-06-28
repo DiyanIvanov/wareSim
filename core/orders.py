@@ -1,6 +1,9 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List, Dict
+from datetime import datetime
+import pandas as pd
+import salabim as sim
 
 
 @dataclass
@@ -43,12 +46,12 @@ class DistributeProductByCustomer(BaseOrder):
 
 @dataclass(order=True)
 class IntakeOrder(BaseOrder):
-    due_time: float
+    arrival_time: float
     products: Dict[str, int]
 
     def __post_init__(self):
         super().__post_init__()
-        if self.due_time <= 0:
+        if self.arrival_time <= 0:
             raise ValueError("due time must be positive")
         if not self.products:
             raise ValueError("products must not be empty")
@@ -71,3 +74,50 @@ class PalletToLocation(BaseOrder):
             raise ValueError("initial location must be provided")
         if not self.destination_location:
             raise ValueError("destination location must be provided")
+
+@dataclass
+class Pallet:
+    product: str
+    qty: int
+    order_id: str
+
+
+class IntakeOrderGenerator(sim.Component):
+
+    def __init__(self, warehouse, orders_file, **kwargs):
+        super().__init__(**kwargs)
+        self.warehouse = warehouse
+        self.orders = self._load_orders_from_csv(orders_file)
+
+    def _load_orders_from_csv(self, file_path):
+        data = pd.read_csv(file_path)
+        orders = []
+
+        for order in data['order_id'].unique():
+            orders.append(IntakeOrder(
+                id=order,
+                locations=['Salabim'],
+                created_at=1,
+                status="Pending",
+                arrival_time=data[data['order_id'] == order]['due_time'].values[0],
+                products=self._load_pallets(data, order),
+                estimated_completion_time=0.1
+            ))
+
+        return sorted(orders, key=lambda o: o.arrival_time)
+
+    def _load_pallets(self, data, order_id):
+        pallets_data = data[data['order_id'] == order_id]
+        pallets = []
+        for _, row in pallets_data.iterrows():
+            pallets.append(Pallet(
+                product=row['product'],
+                qty=int(row['qty']),
+                order_id=order_id,
+            ))
+        return pallets
+
+    def process(self):
+        for order in self.orders:
+            self.hold(order.arrival_time - self.env.now())
+            order.enter(self.warehouse.intake_queue)
