@@ -90,5 +90,7 @@ class IntakeWorker(Worker):
 
             for pallet in self.order.pallets:
                 self.hold(self.INTAKE_RATE_PER_PALLET)
+
+            self.order = None
                 
 
