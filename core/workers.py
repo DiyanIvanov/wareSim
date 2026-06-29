@@ -14,7 +14,7 @@ class Worker(sim.Component, ABC):
         self.short_break = short_break
         self.lunch_break = lunch_break
         self.warehouse_layout = warehouse
-        self.breaks_taken = set()
+        self.breaks_taken = {0}
         self.lunch_breaks = 0
 
     @abstractmethod
