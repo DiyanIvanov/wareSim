@@ -23,10 +23,9 @@ class Worker(sim.Component, ABC):
         raise NotImplementedError
 
     def get_short_break(self):
-        if self._break_allowed():
-            current_breaks = max(self.breaks_taken)
-            self.breaks_taken.add(current_breaks + 1)
-            self.hold(self.short_break)
+        current_breaks = max(self.breaks_taken)
+        self.breaks_taken.add(current_breaks + 1)
+        self.hold(self.short_break)
 
     def get_lunch_break(self):
         if self.lunch_breaks < 1 and self.LUNCH_WINDOW[1] >= self.env.now() <= self.LUNCH_WINDOW[1]:
@@ -82,6 +81,9 @@ class IntakeWorker(Worker):
 
     def process(self):
         while True:
+            if self._break_allowed():
+                self.get_short_break()
+
             if len(self.warehouse.intake_queue) == 0:
                 self.passivate()
 
