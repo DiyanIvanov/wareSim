@@ -90,6 +90,7 @@ class IntakeWorker(Worker):
 
             for pallet in self.order.pallets:
                 self.hold(self.INTAKE_RATE_PER_PALLET)
+                pallet.enter(self.warehouse.pick_by_customer_staging_area)
 
             self.order = None
                 
