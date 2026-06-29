@@ -74,12 +74,11 @@ class Picker(Worker):
 
 class IntakeWorker(Worker):
 
-    INTAKE_RATE_PER_PALLET = 180 # measured in seconds
-
-    def __init__(self, warehouse, short_break=15, lunch_break=30,**kwargs):
+    def __init__(self, warehouse, intake_rate_in_seconds = 180, short_break=15, lunch_break=30,**kwargs):
         super().__init__(warehouse, short_break=short_break, lunch_break=lunch_break,**kwargs)
         self.order = None
         self.warehouse = warehouse
+        self.intake_rate_in_seconds = intake_rate_in_seconds
 
     def process(self):
         while True:
@@ -89,7 +88,7 @@ class IntakeWorker(Worker):
             self.order = self.warehouse.intake_queue.pop()
 
             for pallet in self.order.pallets:
-                self.hold(self.INTAKE_RATE_PER_PALLET)
+                self.hold(self.intake_rate_in_seconds)
                 pallet.enter(self.warehouse.pick_by_customer_staging_area)
 
             self.order = None
